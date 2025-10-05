@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Custom CRM System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #3498db;
@@ -75,6 +76,8 @@
         
         .sidebar-menu i {
             margin-right: 10px;
+            width: 20px;
+            text-align: center;
         }
         
         /* Main Content Styles */
@@ -137,6 +140,9 @@
         
         .page-header {
             margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .page-header h1 {
@@ -306,6 +312,11 @@
             background-color: #c0392b;
         }
         
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        
         /* Alert Styles */
         .alert {
             padding: 15px;
@@ -346,6 +357,7 @@
             background-color: white;
             padding: 10px;
             min-height: 100px;
+            position: relative;
         }
         
         .calendar-day.empty {
@@ -359,6 +371,7 @@
             margin-bottom: 5px;
             border-radius: 3px;
             font-size: 12px;
+            cursor: pointer;
         }
         
         /* Tabs */
@@ -431,6 +444,91 @@
             color: #777;
         }
         
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        /* Signature Canvas */
+        .signature-pad {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        /* Inventory Items */
+        .inventory-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .inventory-item {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .inventory-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
         /* Responsive */
         @media (max-width: 992px) {
             .container {
@@ -445,6 +543,10 @@
             .dashboard-sections {
                 grid-template-columns: 1fr;
             }
+            
+            .search-bar {
+                width: 200px;
+            }
         }
     </style>
 </head>
@@ -453,17 +555,17 @@
         <!-- Sidebar Navigation -->
         <div class="sidebar">
             <div class="sidebar-header">
-                <h2>CRM System</h2>
+                <h2><i class="fas fa-cube"></i> CRM System</h2>
             </div>
             <ul class="sidebar-menu">
-                <li><a href="#" class="active" data-page="dashboard">Dashboard</a></li>
-                <li><a href="#" data-page="clients">Clients</a></li>
-                <li><a href="#" data-page="quotations">Quotations</a></li>
-                <li><a href="#" data-page="invoices">Invoices</a></li>
-                <li><a href="#" data-page="agreements">Agreements</a></li>
-                <li><a href="#" data-page="inventory">Inventory</a></li>
-                <li><a href="#" data-page="calendar">Calendar</a></li>
-                <li><a href="#" data-page="settings">Settings</a></li>
+                <li><a href="#" class="active" data-page="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="#" data-page="clients"><i class="fas fa-users"></i> Clients</a></li>
+                <li><a href="#" data-page="quotations"><i class="fas fa-file-invoice-dollar"></i> Quotations</a></li>
+                <li><a href="#" data-page="invoices"><i class="fas fa-file-invoice"></i> Invoices</a></li>
+                <li><a href="#" data-page="agreements"><i class="fas fa-file-signature"></i> Agreements</a></li>
+                <li><a href="#" data-page="inventory"><i class="fas fa-boxes"></i> Inventory</a></li>
+                <li><a href="#" data-page="calendar"><i class="fas fa-calendar-alt"></i> Calendar</a></li>
+                <li><a href="#" data-page="settings"><i class="fas fa-cog"></i> Settings</a></li>
             </ul>
         </div>
         
@@ -472,6 +574,7 @@
             <!-- Top Navigation -->
             <div class="top-nav">
                 <div class="search-bar">
+                    <i class="fas fa-search"></i>
                     <input type="text" placeholder="Search clients, notes, phone numbers...">
                 </div>
                 <div class="user-info">
@@ -488,8 +591,13 @@
                 <!-- Dashboard Page -->
                 <div class="page active" id="dashboard">
                     <div class="page-header">
-                        <h1>Dashboard</h1>
-                        <p>Welcome back! Here's what's happening with your business today.</p>
+                        <div>
+                            <h1>Dashboard</h1>
+                            <p>Welcome back! Here's what's happening with your business today.</p>
+                        </div>
+                        <div>
+                            <button class="btn" id="quick-quote-btn"><i class="fas fa-plus"></i> Quick Quote</button>
+                        </div>
                     </div>
                     
                     <!-- Stats Cards -->
@@ -527,6 +635,7 @@
                                                 <th>Date</th>
                                                 <th>Time</th>
                                                 <th>Status</th>
+                                                <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -535,24 +644,36 @@
                                                 <td>Oct 15, 2023</td>
                                                 <td>09:00 - 17:00</td>
                                                 <td><span class="status status-pending">Booking</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm view-event" data-id="1">View</button>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td>Wedding - Johnson & Smith</td>
                                                 <td>Oct 18, 2023</td>
                                                 <td>14:00 - 23:00</td>
                                                 <td><span class="status status-completed">Option</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm view-event" data-id="2">View</button>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td>Product Launch - Innovate Co.</td>
                                                 <td>Oct 22, 2023</td>
                                                 <td>10:00 - 16:00</td>
                                                 <td><span class="status status-pending">Not Paid</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm view-event" data-id="3">View</button>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td>Conference - Business Leaders</td>
                                                 <td>Oct 25, 2023</td>
                                                 <td>08:00 - 18:00</td>
                                                 <td><span class="status status-pending">Not Signed</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm view-event" data-id="4">View</button>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -563,20 +684,20 @@
                             <div class="dashboard-card">
                                 <h2>To Do List</h2>
                                 <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="Add a new task...">
+                                    <input type="text" class="form-control" id="new-task" placeholder="Add a new task...">
                                 </div>
-                                <div>
-                                    <div style="display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee;">
-                                        <input type="checkbox" style="margin-right: 10px;">
-                                        <span>Follow up with Tech Solutions Inc.</span>
+                                <div id="todo-list">
+                                    <div class="todo-item">
+                                        <input type="checkbox" id="task1">
+                                        <label for="task1">Follow up with Tech Solutions Inc.</label>
                                     </div>
-                                    <div style="display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee;">
-                                        <input type="checkbox" style="margin-right: 10px;">
-                                        <span>Prepare quotation for new client</span>
+                                    <div class="todo-item">
+                                        <input type="checkbox" id="task2">
+                                        <label for="task2">Prepare quotation for new client</label>
                                     </div>
-                                    <div style="display: flex; align-items: center; padding: 10px 0;">
-                                        <input type="checkbox" style="margin-right: 10px;" checked>
-                                        <span style="text-decoration: line-through; color: #777;">Update inventory list</span>
+                                    <div class="todo-item">
+                                        <input type="checkbox" id="task3" checked>
+                                        <label for="task3" style="text-decoration: line-through; color: #777;">Update inventory list</label>
                                     </div>
                                 </div>
                             </div>
@@ -589,7 +710,7 @@
                                 <h2>Message Center</h2>
                                 <div class="message-center">
                                     <div class="message">
-                                        <div class="message-icon">!</div>
+                                        <div class="message-icon"><i class="fas fa-exclamation-circle"></i></div>
                                         <div class="message-content">
                                             <div class="message-title">Payment term expired</div>
                                             <div class="message-desc">Invoice #INV-2023-045 for Johnson & Smith is overdue</div>
@@ -597,7 +718,7 @@
                                         </div>
                                     </div>
                                     <div class="message">
-                                        <div class="message-icon">!</div>
+                                        <div class="message-icon"><i class="fas fa-bell"></i></div>
                                         <div class="message-content">
                                             <div class="message-title">Follow-up reminder</div>
                                             <div class="message-desc">Follow up with Tech Solutions Inc. about their upcoming event</div>
@@ -605,7 +726,7 @@
                                         </div>
                                     </div>
                                     <div class="message">
-                                        <div class="message-icon">!</div>
+                                        <div class="message-icon"><i class="fas fa-user-plus"></i></div>
                                         <div class="message-content">
                                             <div class="message-title">New client registration</div>
                                             <div class="message-desc">Global Events Ltd. has signed up for your CRM</div>
@@ -619,16 +740,16 @@
                             <div class="dashboard-card">
                                 <h2>Web Shortcuts</h2>
                                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                                    <div style="text-align: center; padding: 10px; background-color: #f8f9fa; border-radius: 4px;">
-                                        <div style="font-size: 24px; margin-bottom: 5px;">📘</div>
+                                    <div class="web-shortcut" data-url="https://facebook.com">
+                                        <div style="font-size: 24px; margin-bottom: 5px;"><i class="fab fa-facebook"></i></div>
                                         <div style="font-size: 12px;">Facebook</div>
                                     </div>
-                                    <div style="text-align: center; padding: 10px; background-color: #f8f9fa; border-radius: 4px;">
-                                        <div style="font-size: 24px; margin-bottom: 5px;">💬</div>
+                                    <div class="web-shortcut" data-url="https://web.whatsapp.com">
+                                        <div style="font-size: 24px; margin-bottom: 5px;"><i class="fab fa-whatsapp"></i></div>
                                         <div style="font-size: 12px;">WhatsApp</div>
                                     </div>
-                                    <div style="text-align: center; padding: 10px; background-color: #f8f9fa; border-radius: 4px;">
-                                        <div style="font-size: 24px; margin-bottom: 5px;">🚚</div>
+                                    <div class="web-shortcut" data-url="https://fedex.com">
+                                        <div style="font-size: 24px; margin-bottom: 5px;"><i class="fas fa-shipping-fast"></i></div>
                                         <div style="font-size: 12px;">Shipping</div>
                                     </div>
                                 </div>
@@ -640,15 +761,16 @@
                 <!-- Clients Page -->
                 <div class="page" id="clients">
                     <div class="page-header">
-                        <h1>Clients</h1>
-                        <p>Manage your client relationships and information.</p>
+                        <div>
+                            <h1>Clients</h1>
+                            <p>Manage your client relationships and information.</p>
+                        </div>
+                        <button class="btn" id="add-client-btn"><i class="fas fa-plus"></i> Add New Client</button>
                     </div>
                     
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                        <div class="search-bar" style="width: 400px;">
-                            <input type="text" placeholder="Search clients...">
-                        </div>
-                        <button class="btn">Add New Client</button>
+                    <div class="search-bar" style="width: 400px; margin-bottom: 20px;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search clients...">
                     </div>
                     
                     <div class="dashboard-card">
@@ -672,8 +794,8 @@
                                         <td>+1 (555) 123-4567</td>
                                         <td><span class="status status-completed">Active</span></td>
                                         <td>
-                                            <button class="btn" style="padding: 5px 10px; font-size: 14px;">Edit</button>
-                                            <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 14px;">View</button>
+                                            <button class="btn btn-sm edit-client" data-id="1">Edit</button>
+                                            <button class="btn btn-sm btn-secondary view-client" data-id="1">View</button>
                                         </td>
                                     </tr>
                                     <tr>
@@ -683,8 +805,8 @@
                                         <td>+1 (555) 987-6543</td>
                                         <td><span class="status status-completed">Active</span></td>
                                         <td>
-                                            <button class="btn" style="padding: 5px 10px; font-size: 14px;">Edit</button>
-                                            <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 14px;">View</button>
+                                            <button class="btn btn-sm edit-client" data-id="2">Edit</button>
+                                            <button class="btn btn-sm btn-secondary view-client" data-id="2">View</button>
                                         </td>
                                     </tr>
                                     <tr>
@@ -694,8 +816,8 @@
                                         <td>+1 (555) 456-7890</td>
                                         <td><span class="status status-pending">Pending</span></td>
                                         <td>
-                                            <button class="btn" style="padding: 5px 10px; font-size: 14px;">Edit</button>
-                                            <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 14px;">View</button>
+                                            <button class="btn btn-sm edit-client" data-id="3">Edit</button>
+                                            <button class="btn btn-sm btn-secondary view-client" data-id="3">View</button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -707,8 +829,11 @@
                 <!-- Quotations Page -->
                 <div class="page" id="quotations">
                     <div class="page-header">
-                        <h1>Quotations</h1>
-                        <p>Create and manage quotations for your clients.</p>
+                        <div>
+                            <h1>Quotations</h1>
+                            <p>Create and manage quotations for your clients.</p>
+                        </div>
+                        <button class="btn" id="create-quotation-btn"><i class="fas fa-plus"></i> Create New Quotation</button>
                     </div>
                     
                     <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
@@ -718,7 +843,6 @@
                             <div class="tab" data-tab="accepted">Accepted</div>
                             <div class="tab" data-tab="rejected">Rejected</div>
                         </div>
-                        <button class="btn">Create New Quotation</button>
                     </div>
                     
                     <div class="tab-content active" id="all">
@@ -745,8 +869,8 @@
                                             <td>Oct 10, 2023</td>
                                             <td><span class="status status-pending">Pending</span></td>
                                             <td>
-                                                <button class="btn" style="padding: 5px 10px; font-size: 14px;">Edit</button>
-                                                <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 14px;">View</button>
+                                                <button class="btn btn-sm edit-quotation" data-id="1">Edit</button>
+                                                <button class="btn btn-sm btn-secondary view-quotation" data-id="1">View</button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -757,8 +881,8 @@
                                             <td>Oct 12, 2023</td>
                                             <td><span class="status status-completed">Accepted</span></td>
                                             <td>
-                                                <button class="btn" style="padding: 5px 10px; font-size: 14px;">Edit</button>
-                                                <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 14px;">View</button>
+                                                <button class="btn btn-sm edit-quotation" data-id="2">Edit</button>
+                                                <button class="btn btn-sm btn-secondary view-quotation" data-id="2">View</button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -769,8 +893,8 @@
                                             <td>Oct 14, 2023</td>
                                             <td><span class="status status-paid">Rejected</span></td>
                                             <td>
-                                                <button class="btn" style="padding: 5px 10px; font-size: 14px;">Edit</button>
-                                                <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 14px;">View</button>
+                                                <button class="btn btn-sm edit-quotation" data-id="3">Edit</button>
+                                                <button class="btn btn-sm btn-secondary view-quotation" data-id="3">View</button>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -783,8 +907,11 @@
                 <!-- Invoices Page -->
                 <div class="page" id="invoices">
                     <div class="page-header">
-                        <h1>Invoices</h1>
-                        <p>Manage and track your invoices.</p>
+                        <div>
+                            <h1>Invoices</h1>
+                            <p>Manage and track your invoices.</p>
+                        </div>
+                        <button class="btn" id="create-invoice-btn"><i class="fas fa-plus"></i> Create New Invoice</button>
                     </div>
                     
                     <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
@@ -793,7 +920,6 @@
                             <div class="tab" data-tab="paid">Paid</div>
                             <div class="tab" data-tab="overdue">Overdue</div>
                         </div>
-                        <button class="btn">Create New Invoice</button>
                     </div>
                     
                     <div class="tab-content active" id="all-invoices">
@@ -820,8 +946,8 @@
                                             <td>Oct 15, 2023</td>
                                             <td><span class="status status-pending">Overdue</span></td>
                                             <td>
-                                                <button class="btn" style="padding: 5px 10px; font-size: 14px;">Edit</button>
-                                                <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 14px;">View</button>
+                                                <button class="btn btn-sm edit-invoice" data-id="1">Edit</button>
+                                                <button class="btn btn-sm btn-secondary view-invoice" data-id="1">View</button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -832,8 +958,8 @@
                                             <td>Oct 24, 2023</td>
                                             <td><span class="status status-pending">Pending</span></td>
                                             <td>
-                                                <button class="btn" style="padding: 5px 10px; font-size: 14px;">Edit</button>
-                                                <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 14px;">View</button>
+                                                <button class="btn btn-sm edit-invoice" data-id="2">Edit</button>
+                                                <button class="btn btn-sm btn-secondary view-invoice" data-id="2">View</button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -844,8 +970,8 @@
                                             <td>Oct 26, 2023</td>
                                             <td><span class="status status-paid">Paid</span></td>
                                             <td>
-                                                <button class="btn" style="padding: 5px 10px; font-size: 14px;">Edit</button>
-                                                <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 14px;">View</button>
+                                                <button class="btn btn-sm edit-invoice" data-id="3">Edit</button>
+                                                <button class="btn btn-sm btn-secondary view-invoice" data-id="3">View</button>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -858,8 +984,11 @@
                 <!-- Agreements Page -->
                 <div class="page" id="agreements">
                     <div class="page-header">
-                        <h1>Agreements</h1>
-                        <p>Manage client agreements and signatures.</p>
+                        <div>
+                            <h1>Agreements</h1>
+                            <p>Manage client agreements and signatures.</p>
+                        </div>
+                        <button class="btn" id="create-agreement-btn"><i class="fas fa-plus"></i> Create New Agreement</button>
                     </div>
                     
                     <div class="dashboard-card">
@@ -883,8 +1012,8 @@
                                         <td>Oct 10, 2023</td>
                                         <td><span class="status status-pending">Pending Signature</span></td>
                                         <td>
-                                            <button class="btn" style="padding: 5px 10px; font-size: 14px;">Edit</button>
-                                            <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 14px;">View</button>
+                                            <button class="btn btn-sm edit-agreement" data-id="1">Edit</button>
+                                            <button class="btn btn-sm btn-secondary view-agreement" data-id="1">View</button>
                                         </td>
                                     </tr>
                                     <tr>
@@ -894,8 +1023,8 @@
                                         <td>Oct 12, 2023</td>
                                         <td><span class="status status-completed">Signed</span></td>
                                         <td>
-                                            <button class="btn" style="padding: 5px 10px; font-size: 14px;">Edit</button>
-                                            <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 14px;">View</button>
+                                            <button class="btn btn-sm edit-agreement" data-id="2">Edit</button>
+                                            <button class="btn btn-sm btn-secondary view-agreement" data-id="2">View</button>
                                         </td>
                                     </tr>
                                     <tr>
@@ -905,8 +1034,8 @@
                                         <td>Oct 14, 2023</td>
                                         <td><span class="status status-paid">Expired</span></td>
                                         <td>
-                                            <button class="btn" style="padding: 5px 10px; font-size: 14px;">Edit</button>
-                                            <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 14px;">View</button>
+                                            <button class="btn btn-sm edit-agreement" data-id="3">Edit</button>
+                                            <button class="btn btn-sm btn-secondary view-agreement" data-id="3">View</button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -918,8 +1047,11 @@
                 <!-- Inventory Page -->
                 <div class="page" id="inventory">
                     <div class="page-header">
-                        <h1>Inventory</h1>
-                        <p>Manage your product inventory and packing lists.</p>
+                        <div>
+                            <h1>Inventory</h1>
+                            <p>Manage your product inventory and packing lists.</p>
+                        </div>
+                        <button class="btn" id="add-product-btn"><i class="fas fa-plus"></i> Add New Product</button>
                     </div>
                     
                     <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
@@ -928,59 +1060,42 @@
                             <div class="tab" data-tab="packing">Packing Lists</div>
                             <div class="tab" data-tab="troubles">Troubles</div>
                         </div>
-                        <button class="btn">Add New Product</button>
                     </div>
                     
                     <div class="tab-content active" id="products">
-                        <div class="dashboard-card">
-                            <div class="table-container">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Product ID</th>
-                                            <th>Product Name</th>
-                                            <th>Category</th>
-                                            <th>Quantity</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>PRD-001</td>
-                                            <td>Audio Set for 40 People</td>
-                                            <td>Audio Equipment</td>
-                                            <td>5</td>
-                                            <td><span class="status status-completed">Available</span></td>
-                                            <td>
-                                                <button class="btn" style="padding: 5px 10px; font-size: 14px;">Edit</button>
-                                                <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 14px;">View</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>PRD-002</td>
-                                            <td>LED Video Wall Panel</td>
-                                            <td>Video Equipment</td>
-                                            <td>12</td>
-                                            <td><span class="status status-pending">Low Stock</span></td>
-                                            <td>
-                                                <button class="btn" style="padding: 5px 10px; font-size: 14px;">Edit</button>
-                                                <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 14px;">View</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>PRD-003</td>
-                                            <td>Wireless Microphone Set</td>
-                                            <td>Audio Equipment</td>
-                                            <td>8</td>
-                                            <td><span class="status status-completed">Available</span></td>
-                                            <td>
-                                                <button class="btn" style="padding: 5px 10px; font-size: 14px;">Edit</button>
-                                                <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 14px;">View</button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                        <div class="inventory-items">
+                            <div class="inventory-item">
+                                <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Audio Set">
+                                <h3>Audio Set for 40 People</h3>
+                                <p>Category: Audio Equipment</p>
+                                <p>Quantity: 5</p>
+                                <span class="status status-completed">Available</span>
+                                <div style="margin-top: 10px;">
+                                    <button class="btn btn-sm edit-product" data-id="1">Edit</button>
+                                    <button class="btn btn-sm btn-secondary view-product" data-id="1">View</button>
+                                </div>
+                            </div>
+                            <div class="inventory-item">
+                                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="LED Video Wall">
+                                <h3>LED Video Wall Panel</h3>
+                                <p>Category: Video Equipment</p>
+                                <p>Quantity: 12</p>
+                                <span class="status status-pending">Low Stock</span>
+                                <div style="margin-top: 10px;">
+                                    <button class="btn btn-sm edit-product" data-id="2">Edit</button>
+                                    <button class="btn btn-sm btn-secondary view-product" data-id="2">View</button>
+                                </div>
+                            </div>
+                            <div class="inventory-item">
+                                <img src="https://images.unsplash.com/photo-1589003077984-894e133dabab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Wireless Microphone">
+                                <h3>Wireless Microphone Set</h3>
+                                <p>Category: Audio Equipment</p>
+                                <p>Quantity: 8</p>
+                                <span class="status status-completed">Available</span>
+                                <div style="margin-top: 10px;">
+                                    <button class="btn btn-sm edit-product" data-id="3">Edit</button>
+                                    <button class="btn btn-sm btn-secondary view-product" data-id="3">View</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -989,78 +1104,29 @@
                 <!-- Calendar Page -->
                 <div class="page" id="calendar">
                     <div class="page-header">
-                        <h1>Calendar</h1>
-                        <p>View and manage your events and bookings.</p>
+                        <div>
+                            <h1>Calendar</h1>
+                            <p>View and manage your events and bookings.</p>
+                        </div>
+                        <button class="btn" id="add-event-btn"><i class="fas fa-plus"></i> Add Event</button>
                     </div>
                     
                     <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                         <div>
-                            <button class="btn btn-secondary" style="margin-right: 10px;">Today</button>
-                            <button class="btn" style="margin-right: 10px;">Week</button>
-                            <button class="btn">Month</button>
+                            <button class="btn btn-secondary" id="today-btn" style="margin-right: 10px;">Today</button>
+                            <button class="btn" id="week-btn" style="margin-right: 10px;">Week</button>
+                            <button class="btn" id="month-btn">Month</button>
                         </div>
                         <div>
-                            <button class="btn" style="margin-right: 10px;">←</button>
-                            <span style="font-weight: 600;">October 2023</span>
-                            <button class="btn" style="margin-left: 10px;">→</button>
+                            <button class="btn" id="prev-month" style="margin-right: 10px;">←</button>
+                            <span style="font-weight: 600;" id="current-month">October 2023</span>
+                            <button class="btn" id="next-month" style="margin-left: 10px;">→</button>
                         </div>
-                        <button class="btn">Add Event</button>
                     </div>
                     
                     <div class="dashboard-card">
-                        <div class="calendar">
-                            <div class="calendar-header">Sun</div>
-                            <div class="calendar-header">Mon</div>
-                            <div class="calendar-header">Tue</div>
-                            <div class="calendar-header">Wed</div>
-                            <div class="calendar-header">Thu</div>
-                            <div class="calendar-header">Fri</div>
-                            <div class="calendar-header">Sat</div>
-                            
-                            <!-- Calendar days -->
-                            <div class="calendar-day empty">1</div>
-                            <div class="calendar-day empty">2</div>
-                            <div class="calendar-day empty">3</div>
-                            <div class="calendar-day">4</div>
-                            <div class="calendar-day">5</div>
-                            <div class="calendar-day">6</div>
-                            <div class="calendar-day">7</div>
-                            <div class="calendar-day">8</div>
-                            <div class="calendar-day">9</div>
-                            <div class="calendar-day">10</div>
-                            <div class="calendar-day">11</div>
-                            <div class="calendar-day">12</div>
-                            <div class="calendar-day">13</div>
-                            <div class="calendar-day">14</div>
-                            <div class="calendar-day">
-                                15
-                                <div class="calendar-event">Corporate Event</div>
-                            </div>
-                            <div class="calendar-day">16</div>
-                            <div class="calendar-day">17</div>
-                            <div class="calendar-day">
-                                18
-                                <div class="calendar-event">Wedding</div>
-                            </div>
-                            <div class="calendar-day">19</div>
-                            <div class="calendar-day">20</div>
-                            <div class="calendar-day">21</div>
-                            <div class="calendar-day">
-                                22
-                                <div class="calendar-event">Product Launch</div>
-                            </div>
-                            <div class="calendar-day">23</div>
-                            <div class="calendar-day">24</div>
-                            <div class="calendar-day">
-                                25
-                                <div class="calendar-event">Conference</div>
-                            </div>
-                            <div class="calendar-day">26</div>
-                            <div class="calendar-day">27</div>
-                            <div class="calendar-day">28</div>
-                            <div class="calendar-day">29</div>
-                            <div class="calendar-day">30</div>
-                            <div class="calendar-day">31</div>
+                        <div class="calendar" id="calendar-view">
+                            <!-- Calendar will be generated by JavaScript -->
                         </div>
                     </div>
                 </div>
@@ -1118,7 +1184,146 @@
         </div>
     </div>
 
+    <!-- Add Client Modal -->
+    <div class="modal" id="client-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Client</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="client-company">Company Name</label>
+                    <input type="text" class="form-control" id="client-company">
+                </div>
+                <div class="form-group">
+                    <label for="client-contact">Contact Person</label>
+                    <input type="text" class="form-control" id="client-contact">
+                </div>
+                <div class="form-group">
+                    <label for="client-email">Email</label>
+                    <input type="email" class="form-control" id="client-email">
+                </div>
+                <div class="form-group">
+                    <label for="client-phone">Phone</label>
+                    <input type="text" class="form-control" id="client-phone">
+                </div>
+                <div class="form-group">
+                    <label for="client-address">Address</label>
+                    <textarea class="form-control" id="client-address" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Cancel</button>
+                <button class="btn" id="save-client">Save Client</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Quotation Modal -->
+    <div class="modal" id="quotation-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Quotation</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="quotation-client">Client</label>
+                    <select class="form-control" id="quotation-client">
+                        <option>Select a client</option>
+                        <option>Tech Solutions Inc.</option>
+                        <option>Global Events Ltd.</option>
+                        <option>Innovate Co.</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="quotation-project">Project Name</label>
+                    <input type="text" class="form-control" id="quotation-project">
+                </div>
+                <div class="form-group">
+                    <label for="quotation-date">Date</label>
+                    <input type="date" class="form-control" id="quotation-date">
+                </div>
+                <div class="form-group">
+                    <label for="quotation-amount">Amount</label>
+                    <input type="number" class="form-control" id="quotation-amount" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="quotation-notes">Notes</label>
+                    <textarea class="form-control" id="quotation-notes" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Cancel</button>
+                <button class="btn" id="save-quotation">Save Quotation</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Event Modal -->
+    <div class="modal" id="event-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Event Details</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="event-details">
+                    <!-- Event details will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Dummy data for demonstration
+        const events = {
+            1: {
+                title: "Corporate Event - Tech Solutions Inc.",
+                date: "Oct 15, 2023",
+                time: "09:00 - 17:00",
+                status: "Booking",
+                description: "Annual corporate meeting with presentation equipment and audio setup.",
+                client: "Tech Solutions Inc.",
+                contact: "John Smith",
+                location: "Tech Solutions HQ, 123 Business Ave"
+            },
+            2: {
+                title: "Wedding - Johnson & Smith",
+                date: "Oct 18, 2023",
+                time: "14:00 - 23:00",
+                status: "Option",
+                description: "Evening wedding ceremony and reception with full audio and lighting.",
+                client: "Johnson & Smith",
+                contact: "Sarah Johnson",
+                location: "Grand Venue, 456 Celebration St"
+            },
+            3: {
+                title: "Product Launch - Innovate Co.",
+                date: "Oct 22, 2023",
+                time: "10:00 - 16:00",
+                status: "Not Paid",
+                description: "New product unveiling with stage setup and multimedia presentation.",
+                client: "Innovate Co.",
+                contact: "Michael Brown",
+                location: "Innovation Center, 789 Tech Blvd"
+            },
+            4: {
+                title: "Conference - Business Leaders",
+                date: "Oct 25, 2023",
+                time: "08:00 - 18:00",
+                status: "Not Signed",
+                description: "Annual business leadership conference with multiple sessions.",
+                client: "Business Leaders Association",
+                contact: "Robert Wilson",
+                location: "Convention Center, 101 Main St"
+            }
+        };
+
         // Page Navigation
         document.querySelectorAll('.sidebar-menu a').forEach(link => {
             link.addEventListener('click', function(e) {
@@ -1168,19 +1373,45 @@
         });
         
         // Add task functionality
-        const taskInput = document.querySelector('input[placeholder="Add a new task..."]');
+        const taskInput = document.getElementById('new-task');
         taskInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && this.value.trim() !== '') {
-                const todoList = this.parentElement.nextElementSibling;
+                const todoList = document.getElementById('todo-list');
+                const taskId = 'task' + (todoList.children.length + 1);
+                
                 const newTask = document.createElement('div');
-                newTask.style.cssText = 'display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee;';
+                newTask.className = 'todo-item';
                 newTask.innerHTML = `
-                    <input type="checkbox" style="margin-right: 10px;">
-                    <span>${this.value}</span>
+                    <input type="checkbox" id="${taskId}">
+                    <label for="${taskId}">${this.value}</label>
                 `;
                 todoList.appendChild(newTask);
                 this.value = '';
+                
+                // Add event listener to new checkbox
+                newTask.querySelector('input').addEventListener('change', function() {
+                    if (this.checked) {
+                        this.nextElementSibling.style.textDecoration = 'line-through';
+                        this.nextElementSibling.style.color = '#777';
+                    } else {
+                        this.nextElementSibling.style.textDecoration = 'none';
+                        this.nextElementSibling.style.color = 'inherit';
+                    }
+                });
             }
+        });
+        
+        // Add event listeners to existing checkboxes
+        document.querySelectorAll('.todo-item input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    this.nextElementSibling.style.textDecoration = 'line-through';
+                    this.nextElementSibling.style.color = '#777';
+                } else {
+                    this.nextElementSibling.style.textDecoration = 'none';
+                    this.nextElementSibling.style.color = 'inherit';
+                }
+            });
         });
         
         // Search functionality
@@ -1190,6 +1421,263 @@
                 alert(`Searching for: ${this.value}`);
                 // In a real application, this would trigger an API call or filter results
             }
+        });
+        
+        // Web shortcuts functionality
+        document.querySelectorAll('.web-shortcut').forEach(shortcut => {
+            shortcut.addEventListener('click', function() {
+                const url = this.getAttribute('data-url');
+                alert(`Opening: ${url}`);
+                // In a real application, this would open the URL in a new tab
+            });
+        });
+        
+        // Modal functionality
+        const modals = document.querySelectorAll('.modal');
+        const closeModalButtons = document.querySelectorAll('.close-modal');
+        
+        // Open modals
+        document.getElementById('add-client-btn').addEventListener('click', () => {
+            document.getElementById('client-modal').classList.add('active');
+        });
+        
+        document.getElementById('create-quotation-btn').addEventListener('click', () => {
+            document.getElementById('quotation-modal').classList.add('active');
+        });
+        
+        document.getElementById('quick-quote-btn').addEventListener('click', () => {
+            document.getElementById('quotation-modal').classList.add('active');
+        });
+        
+        // View event modals
+        document.querySelectorAll('.view-event').forEach(button => {
+            button.addEventListener('click', function() {
+                const eventId = this.getAttribute('data-id');
+                const event = events[eventId];
+                
+                if (event) {
+                    document.getElementById('event-details').innerHTML = `
+                        <h3>${event.title}</h3>
+                        <p><strong>Date:</strong> ${event.date}</p>
+                        <p><strong>Time:</strong> ${event.time}</p>
+                        <p><strong>Status:</strong> ${event.status}</p>
+                        <p><strong>Client:</strong> ${event.client}</p>
+                        <p><strong>Contact:</strong> ${event.contact}</p>
+                        <p><strong>Location:</strong> ${event.location}</p>
+                        <p><strong>Description:</strong> ${event.description}</p>
+                    `;
+                    document.getElementById('event-modal').classList.add('active');
+                }
+            });
+        });
+        
+        // Close modals
+        closeModalButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                modals.forEach(modal => modal.classList.remove('active'));
+            });
+        });
+        
+        // Close modal when clicking outside
+        modals.forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+        
+        // Save client
+        document.getElementById('save-client').addEventListener('click', () => {
+            const company = document.getElementById('client-company').value;
+            const contact = document.getElementById('client-contact').value;
+            
+            if (company && contact) {
+                alert(`Client ${company} added successfully!`);
+                document.getElementById('client-modal').classList.remove('active');
+                
+                // Reset form
+                document.getElementById('client-company').value = '';
+                document.getElementById('client-contact').value = '';
+                document.getElementById('client-email').value = '';
+                document.getElementById('client-phone').value = '';
+                document.getElementById('client-address').value = '';
+            } else {
+                alert('Please fill in at least company name and contact person');
+            }
+        });
+        
+        // Save quotation
+        document.getElementById('save-quotation').addEventListener('click', () => {
+            const client = document.getElementById('quotation-client').value;
+            const project = document.getElementById('quotation-project').value;
+            
+            if (client && project && client !== 'Select a client') {
+                alert(`Quotation for ${project} created successfully!`);
+                document.getElementById('quotation-modal').classList.remove('active');
+                
+                // Reset form
+                document.getElementById('quotation-client').value = '';
+                document.getElementById('quotation-project').value = '';
+                document.getElementById('quotation-date').value = '';
+                document.getElementById('quotation-amount').value = '';
+                document.getElementById('quotation-notes').value = '';
+            } else {
+                alert('Please select a client and enter a project name');
+            }
+        });
+        
+        // Calendar functionality
+        function generateCalendar() {
+            const calendar = document.getElementById('calendar-view');
+            calendar.innerHTML = '';
+            
+            // Add headers
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-header';
+                header.textContent = day;
+                calendar.appendChild(header);
+            });
+            
+            // Add days
+            for (let i = 1; i <= 31; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.textContent = i;
+                
+                // Add events to specific days
+                if (i === 15) {
+                    const event = document.createElement('div');
+                    event.className = 'calendar-event';
+                    event.textContent = 'Corporate Event';
+                    event.setAttribute('data-id', '1');
+                    event.addEventListener('click', function() {
+                        const eventId = this.getAttribute('data-id');
+                        const event = events[eventId];
+                        
+                        if (event) {
+                            document.getElementById('event-details').innerHTML = `
+                                <h3>${event.title}</h3>
+                                <p><strong>Date:</strong> ${event.date}</p>
+                                <p><strong>Time:</strong> ${event.time}</p>
+                                <p><strong>Status:</strong> ${event.status}</p>
+                                <p><strong>Client:</strong> ${event.client}</p>
+                                <p><strong>Contact:</strong> ${event.contact}</p>
+                                <p><strong>Location:</strong> ${event.location}</p>
+                                <p><strong>Description:</strong> ${event.description}</p>
+                            `;
+                            document.getElementById('event-modal').classList.add('active');
+                        }
+                    });
+                    day.appendChild(event);
+                }
+                
+                if (i === 18) {
+                    const event = document.createElement('div');
+                    event.className = 'calendar-event';
+                    event.textContent = 'Wedding';
+                    event.setAttribute('data-id', '2');
+                    event.addEventListener('click', function() {
+                        const eventId = this.getAttribute('data-id');
+                        const event = events[eventId];
+                        
+                        if (event) {
+                            document.getElementById('event-details').innerHTML = `
+                                <h3>${event.title}</h3>
+                                <p><strong>Date:</strong> ${event.date}</p>
+                                <p><strong>Time:</strong> ${event.time}</p>
+                                <p><strong>Status:</strong> ${event.status}</p>
+                                <p><strong>Client:</strong> ${event.client}</p>
+                                <p><strong>Contact:</strong> ${event.contact}</p>
+                                <p><strong>Location:</strong> ${event.location}</p>
+                                <p><strong>Description:</strong> ${event.description}</p>
+                            `;
+                            document.getElementById('event-modal').classList.add('active');
+                        }
+                    });
+                    day.appendChild(event);
+                }
+                
+                if (i === 22) {
+                    const event = document.createElement('div');
+                    event.className = 'calendar-event';
+                    event.textContent = 'Product Launch';
+                    event.setAttribute('data-id', '3');
+                    event.addEventListener('click', function() {
+                        const eventId = this.getAttribute('data-id');
+                        const event = events[eventId];
+                        
+                        if (event) {
+                            document.getElementById('event-details').innerHTML = `
+                                <h3>${event.title}</h3>
+                                <p><strong>Date:</strong> ${event.date}</p>
+                                <p><strong>Time:</strong> ${event.time}</p>
+                                <p><strong>Status:</strong> ${event.status}</p>
+                                <p><strong>Client:</strong> ${event.client}</p>
+                                <p><strong>Contact:</strong> ${event.contact}</p>
+                                <p><strong>Location:</strong> ${event.location}</p>
+                                <p><strong>Description:</strong> ${event.description}</p>
+                            `;
+                            document.getElementById('event-modal').classList.add('active');
+                        }
+                    });
+                    day.appendChild(event);
+                }
+                
+                if (i === 25) {
+                    const event = document.createElement('div');
+                    event.className = 'calendar-event';
+                    event.textContent = 'Conference';
+                    event.setAttribute('data-id', '4');
+                    event.addEventListener('click', function() {
+                        const eventId = this.getAttribute('data-id');
+                        const event = events[eventId];
+                        
+                        if (event) {
+                            document.getElementById('event-details').innerHTML = `
+                                <h3>${event.title}</h3>
+                                <p><strong>Date:</strong> ${event.date}</p>
+                                <p><strong>Time:</strong> ${event.time}</p>
+                                <p><strong>Status:</strong> ${event.status}</p>
+                                <p><strong>Client:</strong> ${event.client}</p>
+                                <p><strong>Contact:</strong> ${event.contact}</p>
+                                <p><strong>Location:</strong> ${event.location}</p>
+                                <p><strong>Description:</strong> ${event.description}</p>
+                            `;
+                            document.getElementById('event-modal').classList.add('active');
+                        }
+                    });
+                    day.appendChild(event);
+                }
+                
+                calendar.appendChild(day);
+            }
+        }
+        
+        // Initialize calendar
+        generateCalendar();
+        
+        // Calendar navigation
+        document.getElementById('today-btn').addEventListener('click', () => {
+            alert('Showing today\'s events');
+        });
+        
+        document.getElementById('week-btn').addEventListener('click', () => {
+            alert('Switching to week view');
+        });
+        
+        document.getElementById('month-btn').addEventListener('click', () => {
+            alert('Switching to month view');
+        });
+        
+        document.getElementById('prev-month').addEventListener('click', () => {
+            alert('Showing previous month');
+        });
+        
+        document.getElementById('next-month').addEventListener('click', () => {
+            alert('Showing next month');
         });
         
         // Initialize with dashboard active
